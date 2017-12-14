@@ -1,0 +1,8 @@
+<webscript>
+    <shortname>Get Authorization Url for Oauth2 provider</shortname>
+    <description>returns socialLogin authorizationUrl</description>
+    <url>/socialLogin/{api}/authorizationUrl</url>
+    <authentication>none</authentication>
+    <format default="json"/>
+    <transaction allow="readwrite">required</transaction>
+</webscript>

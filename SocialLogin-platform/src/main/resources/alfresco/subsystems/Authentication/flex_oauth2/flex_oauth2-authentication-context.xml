@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="authenticationComponent"
+          class="com.flexsolution.authentication.oauth2.authentication.Oauth2AuthenticationComponentImpl"
+          parent="authenticationComponentBase">
+        <property name="oauth2APIFactory" ref="oauth2APIFactoryBean"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="personService" ref="personService"/>
+        <property name="transactionService" ref="transactionService"/>
+        <property name="defaultAdministratorUserNameList"
+                  value="${external.authentication.defaultAdministratorUserNames}"/>
+    </bean>
+
+    <!-- Wrapped version to be used within subsystem -->
+    <bean id="AuthenticationComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.repo.security.authentication.AuthenticationComponent</value>
+            </list>
+        </property>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="target" ref="authenticationComponent"/>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Authentication service for chaining -->
+    <bean id="localAuthenticationService" class="org.alfresco.repo.security.authentication.AuthenticationServiceImpl">
+        <property name="ticketComponent" ref="ticketComponent"/>
+        <property name="authenticationComponent" ref="authenticationComponent"/>
+        <property name="sysAdminParams" ref="sysAdminParams"/>
+        <property name="protectedUsersCache" ref="protectedUsersCache"/>
+        <property name="protectionEnabled" value="${authentication.protection.enabled}"/>
+        <property name="protectionLimit" value="${authentication.protection.limit}"/>
+        <property name="protectionPeriodSeconds" value="${authentication.protection.periodSeconds}"/>
+        <property name="personService" ref="PersonService"/>
+    </bean>
+
+    <bean id="userRegistry" class="com.flexsolution.authentication.oauth2.authentication.Oauth2UserRegistry"/>
+</beans>
