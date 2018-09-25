@@ -1,0 +1,8 @@
+/.idea/
+/alf_data_dev/
+*.log*
+*.iml
+/SocialLogin-platform/target/
+/SocialLogin-share/target/
+/target/
+/*.pom.properties
