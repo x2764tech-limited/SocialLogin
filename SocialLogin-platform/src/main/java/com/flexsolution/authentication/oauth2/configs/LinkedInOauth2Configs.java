@@ -7,9 +7,9 @@ public class LinkedInOauth2Configs extends AbstractOauth2Configs {
 
     private static final String LINKED_IN = "linkedIn";
     private static final String LINKED_IN_AVATAR_JPEG = "LinkedIn_avatar.jpeg";
-    private static final String ACCESS_URL = "http://elab.example.org:8085/auth/realms/alfresco/protocol/openid-connect/token";
-    private static final String AUTHORIZATION_URL = "http://elab.example.org:8085/auth/realms/alfresco/protocol/openid-connect/auth";
-    private static final String USER_DATA_URL = "http://elab.example.org:8085/auth/realms/alfresco/protocol/openid-connect/userinfo";
+    private static final String ACCESS_URL = "https://www.linkedin.com/oauth/v2/accessToken";
+    private static final String AUTHORIZATION_URL = "https://www.linkedin.com/uas/oauth2/authorization";
+    private static final String USER_DATA_URL = "https://api.linkedin.com/v1/people/~:(first-name,last-name,id,picture-url,email-address,location,headline,industry,current-share,summary,specialties,positions,public-profile-url)?format=json";
 
     @Override
     String getAccessTokenURL() {
