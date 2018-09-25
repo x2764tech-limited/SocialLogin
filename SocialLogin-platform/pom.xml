@@ -3,6 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>SocialLogin-platform</artifactId>
     <name>Alfresco Platform/Repository SocialLogin JAR Module</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.alfresco.surf</groupId>
+            <artifactId>spring-surf</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
     <packaging>jar</packaging>
 
     <parent>
@@ -15,7 +22,7 @@
     </properties>
 
     <build>
-        <finalName>${artifactId}</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

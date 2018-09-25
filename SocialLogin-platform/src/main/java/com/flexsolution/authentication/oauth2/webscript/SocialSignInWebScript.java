@@ -72,6 +72,9 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         String state = req.getParameter(Oauth2Parameters.STATE);
 
         String sessionState = (String) WebScriptUtils.getSessionAttribute(req, Oauth2Session.OAUTH_2_STATE);
+        if(logger.isTraceEnabled()) {
+            logger.trace(String.format("Session state is %s", sessionState));
+        }
         if (StringUtils.isBlank(state) || StringUtils.isBlank(sessionState) || !state.equals(sessionState)) {
             throw new WebScriptException(Status.STATUS_FORBIDDEN, "CSRF attack was detected");
         }
@@ -156,6 +159,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         nodeService.setProperty(personOrNull, ContentModel.PROP_LOCATION, userMetadata.getLocation().getName());
         Optional<String> industry = Optional.ofNullable(userMetadata.getIndustry());
         Optional<String> headline = Optional.ofNullable(userMetadata.getHeadline());
+
         StringBuilder jobTitle = new StringBuilder();
         industry.ifPresent(jobTitle::append);
         if (industry.isPresent() && headline.isPresent()) {
@@ -168,7 +172,8 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
         Optional.ofNullable(contentService.getWriter(personOrNull, ContentModel.PROP_PERSONDESC, true))
                 .ifPresent(w -> w.putContent(StringUtils.isNotBlank(summary) ? summary : EMPTY_STR));
 
-        updateUserAvatar(personOrNull, userMetadata, apiConfig.getAvatarName());
+
+        //updateUserAvatar(personOrNull, userMetadata, apiConfig.getAvatarName());
     }
 
 
@@ -182,10 +187,17 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
     private void updateUserAvatar(NodeRef personOrNull, UserMetadata userMetadata, String avatarName) {
 
         // remove old image child node if we already have one
+        String pictureUrl = userMetadata.getPictureUrl();
+
+        if(StringUtils.isBlank(pictureUrl)) {
+            logger.debug("Remove avatar if no URL in user metadata");
+            return;
+        }
+
         List<ChildAssociationRef> childAssoc = nodeService.getChildAssocs(personOrNull,
                 ContentModel.ASSOC_PREFERENCE_IMAGE, null, 1, false);
 
-        if (StringUtils.isBlank(userMetadata.getPictureUrl()) && !childAssoc.isEmpty()) {
+        if (StringUtils.isBlank(pictureUrl) && !childAssoc.isEmpty()) {
             nodeService.deleteNode(childAssoc.get(0).getChildRef());
             logger.debug("Remove avatar if no URL in user metadata");
             return;
@@ -207,7 +219,7 @@ public class SocialSignInWebScript extends DeclarativeWebScript {
                 ContentModel.TYPE_CONTENT, map);
         NodeRef newImageNodeRef = associationRef.getChildRef();
 
-        try (InputStream inputStream = new URL(userMetadata.getPictureUrl()).openStream()) {
+        try (InputStream inputStream = new URL(pictureUrl).openStream()) {
             ContentWriter writer = contentService.getWriter(newImageNodeRef, ContentModel.PROP_CONTENT, true);
             writer.setMimetype(MimetypeMap.MIMETYPE_IMAGE_JPEG);//for LinkedIn avatar
             writer.putContent(inputStream);
